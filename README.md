@@ -12,7 +12,7 @@ First, you need to install this plugin on your server where you wanna inspect pa
 3. Upload target jar to Minecraft plugins directory
 
 ## Usage
-This plugin supports two types of commands:<br>
+
 <table>
   <thead>
     <th>Command</th>
