@@ -29,7 +29,7 @@ This plugin supports two types of commands:<br>
   </tbody>
 </table>
 
-### Result of a PLAYER_INFO inspection on a 1.19.2 server
+Result of a PLAYER_INFO inspection on a 1.19.2 server:
 <pre>
 [18:26:14 INFO]: Report for PLAYER_INFO (Server):
 [18:26:14 INFO]: --  Global (7) --
