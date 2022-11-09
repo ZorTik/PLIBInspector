@@ -1,8 +1,11 @@
-# PLIBInspector [![Resource](https://img.shields.io/github/v/release/ZorTik/PLIBInspector)](https://github.com/ZorTik/PLIBInspector/releases) [![Resource](https://img.shields.io/github/license/ZorTik/PLIBInspector)](https://github.com/ZorTik/PLIBInspector)
+# PLIBInspector
+
 Inspect ProtocolLib packets on current version via Minecraft commands.<br>
 This plugin's main idea is to show required types in a packet container for helping with reverse engineering.
 
 This is Minecraft plugin, not a library!
+
+[![Resource](https://img.shields.io/github/v/release/ZorTik/PLIBInspector?style=for-the-badge)](https://github.com/ZorTik/PLIBInspector/releases) [![Resource](https://img.shields.io/github/license/ZorTik/PLIBInspector?style=for-the-badge)](https://github.com/ZorTik/PLIBInspector)
 
 ## Installation
 First, you need to install this plugin on your server where you wanna inspect packets:
