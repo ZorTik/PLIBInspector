@@ -1,0 +1,5 @@
+name: PLIBInspector
+main: me.zort.plibinspector.PLIBInspector
+version: 1.0
+author: ZorTik
+depend: [ProtocolLib]
