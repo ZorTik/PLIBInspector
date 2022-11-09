@@ -5,7 +5,7 @@ This plugin's main idea is to show required types in a packet container for help
 This is Minecraft plugin, not a library!
 
 ## Installation
-First, you need to install this plugin on your server where you wannna inspect packets.
+First, you need to install this plugin on your server where you wanna inspect packets:
 1. Clone this repository to your IDE
 2. Build it using ```shadowJar```
 3. Upload target jar to Minecraft plugins directory
