@@ -7,15 +7,13 @@ import com.comphenix.protocol.reflect.StructureModifier;
 import me.zort.commandlib.annotation.Arg;
 import me.zort.commandlib.annotation.Command;
 import me.zort.commandlib.annotation.CommandMeta;
+import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 @CommandMeta(
         description = "Inspects a PLIB packet type.",
@@ -31,7 +29,10 @@ public class PLIBInspect implements TabCompleter {
 
     @Command("/plibinspect inspect {type}")
     public void inspect(CommandSender sender, @Arg("type") String type) {
-        PacketType.fromName(type).forEach(t -> reportInfo(sender, t));
+        String[] parts = type.split("/");
+        String typeString = parts[0];
+        String[] accessPath = (String[]) ArrayUtils.subarray(parts, 1, parts.length);
+        PacketType.fromName(typeString).forEach(t -> handleInspection(sender, t, accessPath));
     }
 
     @Command("/plibinspect list")
@@ -41,10 +42,52 @@ public class PLIBInspect implements TabCompleter {
         });
     }
 
+    private void handleInspection(CommandSender sender, PacketType type, String[] accessPath) {
+        String inputName = String.format("%s/%s", type.name(), String.join("/", accessPath));
+        sender.sendMessage(String.format("Inspecting %s...", inputName));
+        if(accessPath.length == 0) {
+            reportInfo(sender, type);
+        } else {
+            AbstractStructure current = new PacketContainer(type);
+            for (String methodName : accessPath) {
+                Class<? extends AbstractStructure> clazz = current.getClass();
+                try {
+                    Method method = clazz.getMethod(methodName);
+                    Object modifierCandidate = method.invoke(current);
+                    String errorMessage = null;
+                    if(modifierCandidate instanceof StructureModifier) {
+                        StructureModifier<?> modifier = (StructureModifier<?>) modifierCandidate;
+                        modifier.writeDefaults();
+                        List<?> structuresStorage = modifier.getValues();
+                        Object structure;
+                        if(structuresStorage.size() > 0 && (structure = structuresStorage.get(0)) instanceof AbstractStructure) {
+                            current = (AbstractStructure) structure;
+                        } else {
+                            errorMessage = "There is no present structure in the modifier.";
+                        }
+                    } else {
+                        errorMessage = "Method " + methodName + " does not return a structure modifier!";
+                    }
+                    Optional.ofNullable(errorMessage)
+                            .ifPresent(s -> {
+                                throw new RuntimeException(s);
+                            });
+                } catch (Exception e) {
+                    sender.sendMessage("An Error occured on inspection: " + e.getMessage());
+                    return;
+                }
+            }
+            reportInfo(sender, current, inputName);
+        }
+    }
+
     private void reportInfo(CommandSender sender, PacketType type) {
-        AbstractStructure c = new PacketContainer(type);
+        reportInfo(sender, new PacketContainer(type), String.format("%s (%s)", type.name(), type.isClient() ? "Client" : "Server"));
+    }
+
+    private void reportInfo(CommandSender sender, AbstractStructure c, String structureName) {
         Class<? extends AbstractStructure> aClass = c.getClass();
-        sender.sendMessage(String.format("Report for %s (%s):", type.name(), type.isClient() ? "Client" : "Server"));
+        sender.sendMessage(String.format("Report for %s:", structureName));
         List<String> globals = new ArrayList<>();
         List<String> specific = new ArrayList<>();
         for(Method method : aClass.getMethods()) {
